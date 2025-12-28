@@ -102,6 +102,8 @@ npm run type-check  # Run TypeScript checking
 - [Code Standards](docs/code-standards.md)
 - [Design Guidelines](docs/design-guidelines.md)
 - [Project Roadmap](docs/project-roadmap.md)
+- [Supabase Guide](docs/supabase-guide.md) - Hướng dẫn kết nối database
+- [Vercel Deployment](docs/vercel-deployment-guide.md) - Hướng dẫn deploy
 
 ## Environment Variables
 

@@ -8,7 +8,19 @@ interface TableCheck {
 }
 
 export default async function TestSupabasePage() {
-  const tablesToCheck = ['provinces', 'districts', 'wards', 'streets', 'coefficients']
+  const tablesToCheck = [
+    'users',
+    'districts',
+    'streets',
+    'segments',
+    'land_type_coefficients',
+    'location_coefficients',
+    'area_coefficients',
+    'depth_coefficients',
+    'feng_shui_coefficients',
+    'search_history',
+    'brand_settings',
+  ]
   const tableResults: TableCheck[] = []
   let connectionStatus = 'connected'
 

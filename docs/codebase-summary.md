@@ -1,8 +1,9 @@
 # Land Price App - Codebase Summary
 
-**Version:** 1.5.0
+**Version:** 1.7.0
 **Last Updated:** 2025-12-29
-**Status:** Phase 6 Complete (User Search & Price Calculation)
+**Status:** Phase 7 Complete (Search History Feature)
+**Overall Progress:** 58% - 7 of 12 phases complete
 
 ## Overview
 
@@ -41,6 +42,7 @@ landprice/
 │   │   ├── input.tsx        # Input component with icon support
 │   │   └── select.tsx       # Select dropdown component
 │   ├── header.tsx           # Header with logout (protected pages)
+│   ├── history-card.tsx     # Search history card component
 │   └── admin/
 │       ├── sidebar.tsx      # Admin navigation sidebar
 │       ├── stat-card.tsx    # Statistic card component
@@ -65,7 +67,8 @@ landprice/
 │   │   └── database.types.ts      # Generated types (461 lines)
 │   ├── api/
 │   │   ├── search-data.ts         # Database queries for districts/streets/segments
-│   │   └── coefficients.ts        # Coefficient data aggregation
+│   │   ├── coefficients.ts        # Coefficient data aggregation
+│   │   └── history.ts             # History API client (CRUD operations + formatting)
 │   ├── calculations/
 │   │   └── price-calculator.ts    # Price calculation engine with 5 coefficients
 │   └── mock-data/
@@ -130,6 +133,21 @@ landprice/
 - **Props:** icon, rightElement, ...HTMLAttributes
 - **ForwardRef:** Compatible with form libraries
 - **Focus State:** Primary color border with shadow ring
+
+### User Components
+
+#### History Card Component (`components/history-card.tsx`)
+- **Purpose:** Display individual search history entries as clickable cards
+- **Features:**
+  - Gradient background (cycling through 3 color schemes)
+  - Land type and location badge extraction from coefficients_json
+  - View, share, and delete action buttons
+  - Price and date formatting with Vietnamese locale
+  - Delete confirmation with disabled state
+  - Click handler for viewing full results
+- **Props:** item, index, onView, onShare, onDelete, isDeleting
+- **Styling:** White card with shadow, hover effects, animated entry
+- **Data Flow:** Extracts coefficients from SearchHistory type
 
 #### Select Component (`components/ui/select.tsx`)
 - **Features:** Dropdown select with custom styling
@@ -246,12 +264,27 @@ landprice/
   - Calculation breakdown showing each coefficient applied
   - Vietnamese currency formatting (₫ VND)
   - Live updates when selections change
+  - Saves search to history with segmentId in coefficients_json
 - **Calculation Formula:**
   ```
   price = base_price × land_type_coef × location_coef ×
           area_coef × depth_coef × feng_shui_coef
   ```
 - **Lines of Code:** 570 lines (comprehensive calculation display)
+
+#### User History Page (`app/(user)/history/page.tsx`)
+- **Purpose:** Display user's past searches with pagination and management
+- **Features:**
+  - Stats summary (total queries, districts, displayed items)
+  - Paginated history card list (20 items per page)
+  - Loading spinner, error handling, empty state
+  - Share functionality (copy to clipboard)
+  - Delete with confirmation
+  - View details navigation (routes to results with segmentId)
+  - Real-time pagination state updates
+- **Data Flow:** Uses getHistory(), deleteHistory() from history.ts
+- **State Management:** React useState/useCallback for pagination + CRUD
+- **Lines of Code:** 195 lines (comprehensive history management)
 
 ### Admin Pages
 
@@ -396,6 +429,8 @@ landprice/
 - **Phase 3:** Static admin pages with components
 - **Phase 4:** Supabase setup & database integration
 - **Phase 5:** Authentication system with Better Auth
+- **Phase 6:** User search flow & price calculation
+- **Phase 7:** Search history feature with pagination
 
 ### Phase 5 Details: Authentication System
 
@@ -502,9 +537,32 @@ Feature Tables:
 - Coefficient breakdown showing each factor applied
 - Live recalculation on input changes
 
+### Phase 7 Details: Search History Feature
+
+**Search History Component** (`components/history-card.tsx`)
+- Displays individual search records as gradient-styled cards
+- Extracts land type/location from coefficients_json via helper functions
+- Price formatted as "X tỷ" (billions) or "X triệu" (millions)
+- Date formatted as "HH:MM - Hôm nay/Hôm qua/DD/MM"
+- Action buttons: View (navigate to results), Share (copy text), Delete (with confirm)
+
+**History API Client** (`lib/api/history.ts`)
+- `getHistory(page, limit)` - Returns paginated search records
+- `saveHistory(input)` - Creates new history record with coefficients
+- `deleteHistory(id)` - Removes record by ID
+- `getHistoryById(id)` - Retrieves single record
+- Price/date formatting functions for Vietnamese locale
+- Error handling with custom HistoryApiError class
+
+**History Page** (`app/(user)/history/page.tsx`)
+- Stats cards: total searches, districts, displayed items
+- Paginated card list with "Load more" button
+- States: Loading, Error (with retry), Empty (with CTA)
+- Actions: View (→ results), Share (clipboard), Delete (with confirm)
+- Navigation: segmentId from coefficients_json routes to /results page
+
 ## Future Development Phases
 
-- **Phase 7:** Search history management
 - **Phase 8:** Admin user management
 - **Phase 9:** Admin price management
 - **Phase 10:** Excel upload & parsing

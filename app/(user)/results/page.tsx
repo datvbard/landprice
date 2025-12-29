@@ -2,16 +2,10 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import type {
-  Segment,
-  LandTypeCoefficient,
-  LocationCoefficient,
-  AreaCoefficient,
-  DepthCoefficient,
-  FengShuiCoefficient
-} from '@/lib/supabase/database.types'
 import type { AllCoefficients } from '@/lib/api/coefficients'
-import { calculatePrice, formatPrice, formatPricePerM2 } from '@/lib/calculations/price-calculator'
+import type { SegmentWithLocation } from '@/lib/api/search-data'
+import { calculatePrice } from '@/lib/calculations/price-calculator'
+import { saveHistory } from '@/lib/api/history'
 
 // Icons
 const BackIcon = () => (
@@ -99,10 +93,12 @@ function ResultsContent() {
   const segmentId = searchParams.get('segmentId')
 
   // Data state
-  const [segment, setSegment] = useState<Segment | null>(null)
+  const [segment, setSegment] = useState<SegmentWithLocation | null>(null)
   const [coefficients, setCoefficients] = useState<AllCoefficients | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   // Selection state
   const [selectedPriceType, setSelectedPriceType] = useState<'gov' | 'min' | 'max' | 'avg'>('avg')
@@ -125,7 +121,7 @@ function ResultsContent() {
     async function fetchData() {
       try {
         const [segmentRes, coefsRes] = await Promise.all([
-          fetch(`/api/segments?segmentId=${segmentId}`),
+          fetch(`/api/segments?segmentId=${segmentId}&withLocation=true`),
           fetch('/api/coefficients')
         ])
 
@@ -178,9 +174,52 @@ function ResultsContent() {
 
   const handleCalculate = () => {
     setShowResult(true)
+    setSaved(false) // Reset saved state when recalculating
     setTimeout(() => {
       document.getElementById('valuation-result')?.scrollIntoView({ behavior: 'smooth' })
     }, 100)
+  }
+
+  // Handle save to history
+  const handleSaveHistory = async () => {
+    if (!segment || !coefficients || saving || saved) return
+
+    const result = getResult()
+    if (!result) return
+
+    setSaving(true)
+    try {
+      const selectedLandType = getSelectedItem(coefficients.landTypes, landTypeId)
+      const selectedLocation = getSelectedItem(coefficients.locations, locationId)
+      const selectedAreaCoef = getSelectedItem(coefficients.areas, areaCoefId)
+      const selectedDepth = getSelectedItem(coefficients.depths, depthId)
+      const selectedFengShui = getSelectedItem(coefficients.fengShuis, fengShuiId)
+
+      await saveHistory({
+        district_name: segment.street?.district?.name || '',
+        street_name: segment.street?.name || '',
+        segment_desc: `${segment.segment_from} - ${segment.segment_to}`,
+        area: result.areaNum,
+        total_price: result.totalPrice.avg,
+        segment_id: segmentId || undefined,
+        coefficients_json: {
+          segmentId: segmentId || null,
+          landType: { id: landTypeId, name: selectedLandType?.name, coefficient: result.coefficients.landType },
+          location: { id: locationId, name: selectedLocation?.name, coefficient: result.coefficients.location },
+          area: { id: areaCoefId, name: selectedAreaCoef?.name, coefficient: result.coefficients.area },
+          depth: { id: depthId, name: selectedDepth?.name, coefficient: result.coefficients.depth },
+          fengShui: { id: fengShuiId, name: selectedFengShui?.name, coefficient: result.coefficients.fengShui },
+          total: result.coefficients.total,
+          pricePerM2: result.pricePerM2.avg,
+        },
+      })
+      setSaved(true)
+    } catch (err) {
+      console.error('Error saving history:', err)
+      alert('Không thể lưu kết quả. Vui lòng thử lại.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   // Calculate result
@@ -538,11 +577,35 @@ function ResultsContent() {
               {/* Action Buttons */}
               <div className="grid grid-cols-2 gap-3">
                 <button
-                  onClick={() => alert('Đã lưu kết quả vào lịch sử tra cứu!')}
-                  className="flex items-center justify-center gap-2 p-4 rounded-xl text-base font-semibold cursor-pointer transition-all border-none bg-gradient-primary text-white shadow-button hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(174,28,62,0.4)]"
+                  onClick={handleSaveHistory}
+                  disabled={saving || saved}
+                  className={`flex items-center justify-center gap-2 p-4 rounded-xl text-base font-semibold cursor-pointer transition-all border-none shadow-button ${
+                    saved
+                      ? 'bg-green-500 text-white cursor-default'
+                      : saving
+                      ? 'bg-gray-300 text-gray-500 cursor-wait'
+                      : 'bg-gradient-primary text-white hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(174,28,62,0.4)]'
+                  }`}
                 >
-                  <SaveIcon />
-                  Lưu kết quả
+                  {saved ? (
+                    <>
+                      <CheckIcon />
+                      Đã lưu
+                    </>
+                  ) : saving ? (
+                    <>
+                      <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                      </svg>
+                      Đang lưu...
+                    </>
+                  ) : (
+                    <>
+                      <SaveIcon />
+                      Lưu kết quả
+                    </>
+                  )}
                 </button>
                 <button
                   onClick={() => router.push('/')}

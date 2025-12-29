@@ -59,3 +59,36 @@ export async function getSegmentById(segmentId: string): Promise<Segment | null>
   }
   return data
 }
+
+// Extended segment type with street and district info
+export interface SegmentWithLocation extends Segment {
+  street: {
+    id: string
+    name: string
+    district: {
+      id: string
+      name: string
+    }
+  }
+}
+
+export async function getSegmentByIdWithLocation(segmentId: string): Promise<SegmentWithLocation | null> {
+  const { data, error } = await supabase
+    .from('segments')
+    .select(`
+      *,
+      street:streets!inner(
+        id,
+        name,
+        district:districts!inner(id, name)
+      )
+    `)
+    .eq('id', segmentId)
+    .single()
+
+  if (error) {
+    console.error('Error fetching segment with location:', error)
+    return null
+  }
+  return data as SegmentWithLocation
+}

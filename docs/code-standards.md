@@ -1,8 +1,8 @@
 # Land Price App - Code Standards & Development Guidelines
 
-**Version:** 1.0.0
-**Last Updated:** 2025-12-28
-**Status:** Active
+**Version:** 1.1.0
+**Last Updated:** 2025-12-29
+**Status:** Active (Phase 6 Complete)
 
 ## Overview
 
@@ -865,6 +865,142 @@ How to test these changes.
 
 ## Screenshots (if UI changes)
 Attach before/after screenshots.
+```
+
+## API Route Patterns (Phase 6)
+
+### API Route Structure
+
+```typescript
+// File: app/api/[resource]/route.ts
+import { NextRequest, NextResponse } from 'next/server'
+import type { ApiResponse } from '@/types/api.types'
+
+// Explicit HTTP method handler
+export async function GET(request: NextRequest) {
+  try {
+    // Validate query parameters
+    const params = request.nextUrl.searchParams
+    const districtId = params.get('districtId')
+
+    if (!districtId) {
+      return NextResponse.json<ApiResponse<null>>(
+        { success: false, error: 'Missing districtId parameter' },
+        { status: 400 }
+      )
+    }
+
+    // Query database
+    const data = await supabase
+      .from('streets')
+      .select('*')
+      .eq('district_id', districtId)
+
+    return NextResponse.json<ApiResponse<typeof data>>({
+      success: true,
+      data,
+    })
+  } catch (error) {
+    console.error('[API Error]:', error)
+    return NextResponse.json<ApiResponse<null>>(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+```
+
+### Response Type Pattern
+
+```typescript
+// File: types/api.types.ts
+export interface ApiResponse<T> {
+  success: boolean
+  data?: T
+  error?: string
+}
+
+// Usage in routes
+const response: ApiResponse<District[]> = {
+  success: true,
+  data: districts,
+}
+```
+
+## Calculation Patterns (Phase 6)
+
+### Price Calculator Implementation
+
+```typescript
+// File: lib/calculations/price-calculator.ts
+interface CalculationInput {
+  basePrice: number
+  landTypeCoef: number
+  locationCoef: number
+  areaCoef: number
+  depthCoef: number
+  fengShuiCoef: number
+  area: number
+}
+
+interface CalculationResult {
+  pricePerSqm: number
+  totalPrice: number
+  breakdown: {
+    base: number
+    afterLandType: number
+    afterLocation: number
+    afterArea: number
+    afterDepth: number
+    afterFengShui: number
+  }
+}
+
+export function calculatePrice(input: CalculationInput): CalculationResult {
+  // Apply coefficients sequentially
+  let price = input.basePrice
+  const breakdown = { base: price }
+
+  price *= input.landTypeCoef
+  breakdown.afterLandType = price
+
+  price *= input.locationCoef
+  breakdown.afterLocation = price
+
+  price *= input.areaCoef
+  breakdown.afterArea = price
+
+  price *= input.depthCoef
+  breakdown.afterDepth = price
+
+  price *= input.fengShuiCoef
+  breakdown.afterFengShui = price
+
+  const totalPrice = price * input.area
+
+  return {
+    pricePerSqm: price,
+    totalPrice,
+    breakdown,
+  }
+}
+```
+
+### Currency Formatting
+
+```typescript
+// Format Vietnamese currency (₫ VND)
+export const formatCurrency = (value: number): string => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
+// Usage
+const formatted = formatCurrency(50000000) // "50,000,000 ₫"
 ```
 
 ## Performance Standards

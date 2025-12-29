@@ -1,8 +1,8 @@
 # Land Price App - Project Overview & Product Development Requirements
 
-**Version:** 1.4.0
-**Last Updated:** 2025-12-29
-**Status:** Phase 6 Complete
+**Version:** 1.6.0
+**Last Updated:** 2025-12-29 (Phase 7 Complete)
+**Status:** Phase 7 Complete - 58% Overall (7 of 12 phases)
 **Client:** Agribank Trà Vinh
 
 ## Executive Summary
@@ -150,9 +150,38 @@ Empower citizens and real estate professionals to quickly access accurate proper
 **Timeline:** 2025-12-29
 **Team:** Full-Stack Development
 
-### Phase 7-12: Future Phases (PLANNED)
+### Phase 7: Search History Feature (COMPLETE)
 
-Detailed planning for phases 7-12 in project roadmap
+**Status:** Complete (as of 2025-12-29)
+
+**Deliverables:**
+- Search history storage in database (search_history table)
+- HistoryCard component for displaying search entries
+- History page with paginated list view
+- Delete functionality with confirmation
+- Share functionality (copy to clipboard)
+- View details navigation to results
+- Loading, error, and empty states
+- Pagination support (20 items per page)
+- History API client (lib/api/history.ts)
+- Price/date formatting utilities (Vietnamese locale)
+- Stats summary (total searches, districts, displayed count)
+
+**Key Features Implemented:**
+- GET /api/history?page=x&limit=y - Returns paginated history with stats
+- POST /api/history - Saves new search with coefficients_json
+- DELETE /api/history/:id - Deletes single record
+- segmentId stored in coefficients_json for results navigation
+- Gradient card styling with land type/location badges
+- Vietnamese price formatting ("X tỷ", "X triệu")
+- Relative date formatting ("Hôm nay", "Hôm qua", "DD/MM")
+
+**Timeline:** 2025-12-29
+**Team:** Full-Stack Development
+
+### Phase 8-12: Future Phases (PLANNED)
+
+Detailed planning for phases 8-12 in project roadmap
 
 ## Functional Requirements
 
@@ -241,7 +270,52 @@ Detailed planning for phases 7-12 in project roadmap
 - Provide Vietnamese error messages
 - Log authentication failures
 
-### Phase 6+ (Future Requirements Listed in Phase Documents)
+### Phase 6 - User Search & Calculation
+
+**FR6.1: Search Interface**
+- Render cascading dropdowns (district → street → segment)
+- Load district list from database
+- Filter streets by selected district
+- Filter segments by selected street
+- Support area input field
+- Display calculated prices on selection change
+
+**FR6.2: Price Calculation**
+- Calculate price using 5 coefficient types
+- Display 4 price levels (government, min, max, avg)
+- Show coefficient breakdown details
+- Format prices as Vietnamese currency (₫)
+- Update calculations on input change
+
+### Phase 7 - Search History
+
+**FR7.1: History Display**
+- Load user's search history from database
+- Display history cards with street name, district, price, date
+- Show land type and location badges extracted from coefficients
+- Support pagination (20 items per page)
+- Display loading, error, and empty states
+
+**FR7.2: History Management**
+- Support view action (navigate to results with segmentId)
+- Support share action (copy result to clipboard)
+- Support delete action (with confirmation)
+- Update pagination state after delete
+- Show stats (total searches, districts, displayed items)
+
+**FR7.3: Data Storage**
+- Save search results to search_history table
+- Store coefficients_json with segmentId
+- Store street_name, district_name, segment_desc, area, total_price
+- Timestamp creation automatically
+
+**FR7.4: Formatting**
+- Format prices as "X tỷ" (billions) or "X triệu" (millions)
+- Format dates as relative ("Hôm nay", "Hôm qua") or "DD/MM"
+- Extract land type from coefficients_json.landType.name
+- Extract location from coefficients_json.location.name
+
+### Phase 8+ (Future Requirements Listed in Phase Documents)
 
 ## Non-Functional Requirements
 

@@ -1,13 +1,13 @@
 # Land Price App - Codebase Summary
 
-**Version:** 1.8.0
+**Version:** 1.9.0
 **Last Updated:** 2025-12-29
-**Status:** Phase 8 Complete (Admin User Management)
-**Overall Progress:** 67% - 8 of 12 phases complete
+**Status:** Phase 9 Complete (Admin Price & Coefficient Management)
+**Overall Progress:** 75% - 9 of 12 phases complete
 
 ## Overview
 
-Land Price App is a Next.js 14 application for property valuation queries in Trà Vinh province, Vietnam. Built with Agribank brand identity and optimized for mobile-first experience.
+Land Price App is a Next.js 14 application for property valuation queries in Trà Vinh province, Vietnam. Built with Agribank brand identity and optimized for mobile-first experience. Implements full authentication, search with price calculation, and admin user management.
 
 ## Project Structure
 
@@ -21,23 +21,52 @@ landprice/
 │   │   ├── page.tsx         # Login form with Better Auth
 │   │   └── actions.ts       # Server action for login validation
 │   ├── api/
-│   │   └── auth/[...all]/
-│   │       └── route.ts     # Better Auth API handler
+│   │   ├── auth/[...all]/
+│   │   │   └── route.ts     # Better Auth API handler
+│   │   ├── admin/
+│   │   │   ├── users/
+│   │   │   │   ├── route.ts # GET/POST user endpoints
+│   │   │   │   └── [id]/
+│   │   │   │       └── route.ts # PUT/DELETE user endpoints
+│   │   │   ├── prices/
+│   │   │   │   ├── route.ts # GET/POST price endpoints (Phase 9)
+│   │   │   │   └── [id]/
+│   │   │   │       └── route.ts # PUT/DELETE price endpoints (Phase 9)
+│   │   │   └── coefficients/
+│   │   │       ├── route.ts # GET/POST coefficient endpoints (Phase 9)
+│   │   │       └── [id]/
+│   │   │           └── route.ts # PUT/DELETE coefficient endpoints (Phase 9)
+│   │   ├── districts/
+│   │   │   └── route.ts     # GET districts
+│   │   ├── streets/
+│   │   │   └── route.ts     # GET streets by district
+│   │   ├── segments/
+│   │   │   └── route.ts     # GET segments by street
+│   │   ├── coefficients/
+│   │   │   └── route.ts     # GET all coefficient types
+│   │   └── history/
+│   │       ├── route.ts     # GET/POST history
+│   │       └── [id]/
+│   │           └── route.ts # DELETE history
 │   ├── (user)/              # User route group (protected)
 │   │   ├── layout.tsx       # User layout with header
-│   │   ├── page.tsx         # Search page
+│   │   ├── page.tsx         # Search page with dropdowns
 │   │   ├── results/
-│   │   │   └── page.tsx     # Results page
+│   │   │   └── page.tsx     # Results page with price display
 │   │   └── history/
-│   │       └── page.tsx     # History page
+│   │       └── page.tsx     # History page with pagination
 │   └── (admin)/             # Admin route group (protected)
 │       ├── layout.tsx       # Admin layout with sidebar
 │       ├── dashboard/
 │       │   └── page.tsx     # Admin dashboard with stats & activity
 │       ├── settings/
 │       │   └── page.tsx     # Admin settings page
-│       └── users/
-│           └── page.tsx     # Admin user management (Phase 8)
+│       ├── users/
+│       │   └── page.tsx     # Admin user management (Phase 8)
+│       ├── prices/
+│       │   └── page.tsx     # Admin price management (Phase 9)
+│       └── coefficients/
+│           └── page.tsx     # Admin coefficient management (Phase 9)
 ├── components/
 │   ├── ui/
 │   │   ├── button.tsx       # Reusable button component
@@ -45,6 +74,7 @@ landprice/
 │   │   └── select.tsx       # Select dropdown component
 │   ├── header.tsx           # Header with logout (protected pages)
 │   ├── history-card.tsx     # Search history card component
+│   ├── bottom-nav.tsx       # User bottom navigation
 │   └── admin/
 │       ├── sidebar.tsx      # Admin navigation sidebar
 │       ├── stat-card.tsx    # Statistic card component
@@ -53,41 +83,40 @@ landprice/
 │       └── user-form.tsx    # User CRUD modal form (Phase 8)
 ├── hooks/
 │   └── use-auth.ts          # useAuth custom hook with role checks
-├── docs/
-│   ├── codebase-summary.md          # This file
-│   ├── project-overview-pdr.md      # Product overview and requirements
-│   ├── code-standards.md            # Code standards and patterns
-│   ├── system-architecture.md       # System architecture
-│   └── design-guidelines.md         # Design tokens and guidelines
 ├── lib/
 │   ├── auth/
-│   │   ├── auth.ts                # Better Auth config with PostgreSQL
-│   │   ├── auth-client.ts         # Client-side auth client
-│   │   └── validators.ts          # Email/phone/password validation
+│   │   ├── auth.ts          # Better Auth config with PostgreSQL
+│   │   ├── auth-client.ts   # Client-side auth client
+│   │   └── validators.ts    # Email/phone/password validation
 │   ├── supabase/
-│   │   ├── client.ts              # Supabase client (anon key)
-│   │   ├── server.ts              # Supabase server (service role)
-│   │   └── database.types.ts      # Generated types (461 lines)
+│   │   ├── client.ts        # Supabase client (anon key)
+│   │   ├── server.ts        # Supabase server (service role)
+│   │   └── database.types.ts # Generated types (461 lines)
 │   ├── api/
-│   │   ├── search-data.ts         # Database queries for districts/streets/segments
-│   │   ├── coefficients.ts        # Coefficient data aggregation
-│   │   ├── history.ts             # History API client (CRUD operations + formatting)
-│   │   └── users.ts               # Users API client (Phase 8 CRUD + helpers)
+│   │   ├── search-data.ts   # Database queries for districts/streets/segments
+│   │   ├── coefficients.ts  # Coefficient data aggregation
+│   │   ├── history.ts       # History API client (CRUD operations + formatting)
+│   │   ├── users.ts         # Users API client (Phase 8 CRUD + helpers)
+│   │   ├── admin-prices.ts  # Admin prices API client (Phase 9 CRUD + helpers)
+│   │   └── admin-coefficients.ts # Admin coefficients API client (Phase 9 CRUD + helpers)
 │   ├── calculations/
-│   │   └── price-calculator.ts    # Price calculation engine with 5 coefficients
+│   │   └── price-calculator.ts # Price calculation engine with 5 coefficients
 │   └── mock-data/
-│       └── admin-data.ts          # Mock data for admin pages
+│       └── admin-data.ts    # Mock data for admin pages
+├── docs/
+│   ├── codebase-summary.md  # This file
+│   ├── project-overview-pdr.md # Product overview and requirements
+│   ├── code-standards.md    # Code standards and patterns
+│   ├── system-architecture.md # System architecture
+│   └── design-guidelines.md # Design tokens and guidelines
 ├── middleware.ts            # Route protection middleware
-├── mockup/                   # Design mockups and HTML prototypes
-│   ├── css/design-system.css
-│   └── *.html               # 6 screen mockups
-├── .claude/                 # Claude Code workflows and agents
-├── next.config.js           # Next.js configuration
 ├── tailwind.config.ts       # Tailwind CSS with Agribank design tokens
 ├── tsconfig.json            # TypeScript configuration
+├── next.config.js           # Next.js configuration
 ├── postcss.config.mjs       # PostCSS configuration
 ├── package.json             # Project dependencies
-└── .eslintrc.json           # ESLint rules
+├── .eslintrc.json           # ESLint rules
+└── mockup/                  # Design mockups and HTML prototypes
 
 ```
 
@@ -138,6 +167,12 @@ landprice/
 - **ForwardRef:** Compatible with form libraries
 - **Focus State:** Primary color border with shadow ring
 
+#### Select Component (`components/ui/select.tsx`)
+- **Features:** Dropdown select with custom styling
+- **Props:** options, value, onChange, placeholder
+- **Styling:** Matches input styling for consistency
+- **Accessibility:** Semantic select element
+
 ### User Components
 
 #### History Card Component (`components/history-card.tsx`)
@@ -153,19 +188,31 @@ landprice/
 - **Styling:** White card with shadow, hover effects, animated entry
 - **Data Flow:** Extracts coefficients from SearchHistory type
 
-#### Select Component (`components/ui/select.tsx`)
-- **Features:** Dropdown select with custom styling
-- **Props:** options, value, onChange, placeholder
-- **Styling:** Matches input styling for consistency
-- **Accessibility:** Semantic select element
+#### Bottom Navigation Component (`components/bottom-nav.tsx`)
+- **Purpose:** User navigation menu at bottom of screen
+- **Features:** Active state tracking, icon + text links
+- **Routes:** Home, Results, History with role-based access
+- **Styling:** Fixed bottom, primary color background
+
+#### Header Component (`components/header.tsx`)
+- **Purpose:** User header with logout (protected pages)
+- **Type:** Client Component (`'use client'`)
+- **Features:**
+  - Displays user avatar with initial
+  - Shows user name/email
+  - Admin role badge
+  - Logout button with API integration
+  - Loading skeleton state
+- **Styling:** White background, border-bottom, responsive layout
+- **Usage:** Included in (user) and (admin) layouts
 
 ### Admin Components
 
 #### Sidebar Component (`components/admin/sidebar.tsx`)
 - **Purpose:** Admin navigation menu
 - **Features:** Link navigation, active state indicators
-- **Styling:** Dark background with hover effects
 - **Routes:** Dashboard, Settings, User Management, Price Management
+- **Styling:** Dark background with hover effects
 
 #### Stat Card Component (`components/admin/stat-card.tsx`)
 - **Purpose:** Display key metrics on dashboard
@@ -185,17 +232,19 @@ landprice/
 - **Styling:** List item format with icons
 - **Usage:** Recent activity widget on dashboard
 
-### Header Component (`components/header.tsx`)
-- **Purpose:** User header with logout (protected pages)
+#### User Form Modal (`components/admin/user-form.tsx`)
+- **Purpose:** Create/edit user modal form (Phase 8)
 - **Type:** Client Component (`'use client'`)
 - **Features:**
-  - Displays user avatar with initial
-  - Shows user name/email
-  - Admin role badge
-  - Logout button with API integration
-  - Loading skeleton state
-- **Styling:** White background, border-bottom, responsive layout
-- **Usage:** Included in (user) and (admin) layouts
+  - Create/edit modal form with validation
+  - Fields: full_name, email (required), phone, password
+  - Role selection: user or admin
+  - Active status toggle
+  - Password optional when editing (leave blank to keep current)
+  - Validation: email format, password length (min 8 chars)
+  - Close button and cancel/submit actions
+- **Props:** isOpen, onClose, onSubmit, editUser, isSubmitting
+- **Styling:** Centered modal with backdrop, responsive width
 
 ## Authentication System (Phase 5)
 
@@ -251,9 +300,9 @@ landprice/
   - GET /api/auth/session
 - **Handler:** Proxies all auth requests to Better Auth
 
-### User Pages (Phase 6: Dynamic & Functional)
+## User Pages (Phase 6: Dynamic & Functional)
 
-#### User Search Page (`app/(user)/page.tsx`)
+### User Search Page (`app/(user)/page.tsx`)
 - **Features:** Dynamic cascading dropdowns (district → street → segment)
 - **Data Source:** Real database queries for districts, streets, segments
 - **Components:** Select dropdowns with real-time filtering
@@ -261,7 +310,7 @@ landprice/
 - **Integration:** Calls API routes for data fetching
 - **Lines of Code:** 358 lines (functional with multiple features)
 
-#### User Results Page (`app/(user)/results/page.tsx`)
+### User Results Page (`app/(user)/results/page.tsx`)
 - **Purpose:** Display price calculation results with full breakdown
 - **Features:**
   - 4 price levels (government, min, max, avg)
@@ -276,7 +325,7 @@ landprice/
   ```
 - **Lines of Code:** 570 lines (comprehensive calculation display)
 
-#### User History Page (`app/(user)/history/page.tsx`)
+### User History Page (`app/(user)/history/page.tsx`)
 - **Purpose:** Display user's past searches with pagination and management
 - **Features:**
   - Stats summary (total queries, districts, displayed items)
@@ -289,6 +338,11 @@ landprice/
 - **Data Flow:** Uses getHistory(), deleteHistory() from history.ts
 - **State Management:** React useState/useCallback for pagination + CRUD
 - **Lines of Code:** 195 lines (comprehensive history management)
+
+### Admin Layout (`app/(admin)/layout.tsx`)
+- **Structure:** Sidebar + main content area
+- **Navigation:** Persistent sidebar across admin pages
+- **Styling:** Dark theme with Agribank branding
 
 ### Admin Pages
 
@@ -303,10 +357,174 @@ landprice/
 - **Form Controls:** Input fields, select dropdowns, toggles
 - **Save Actions:** Settings persistence (Phase 4)
 
-#### Admin Layout (`app/(admin)/layout.tsx`)
-- **Structure:** Sidebar + main content area
-- **Navigation:** Persistent sidebar across admin pages
-- **Styling:** Dark theme with Agribank branding
+### Admin User Management Page (`app/(admin)/users/page.tsx`)
+- **Type:** Client Component (`'use client'`)
+- **Purpose:** Complete user CRUD management interface
+- **Features:**
+  - User table with search/filter by email, name, phone
+  - Create button opens modal with empty form
+  - Edit button loads user data into form
+  - Delete button with confirmation (updates state after delete)
+  - Loading spinner, error handling with retry, empty state
+  - Table columns: name, email, phone, role, status, creation date
+  - User count display
+  - Icons for edit/delete actions
+- **State Management:** useState for users, loading, error, form state
+- **API Integration:** getUsers(), createUser(), updateUser(), deleteUser()
+- **Lines of Code:** 289 lines (comprehensive CRUD interface)
+
+## Admin User Management (Phase 8)
+
+### User CRUD API (`lib/api/users.ts`)
+- `getUsers(search?)` - Fetch all users with optional search filter
+- `createUser(input)` - Create new user with validation
+- `updateUser(id, input)` - Update existing user fields
+- `deleteUser(id)` - Delete user by ID
+- `formatRole(role)` - Format role as Vietnamese text
+- `formatUserDate(dateStr)` - Format date as Vietnamese locale
+- UsersApiError custom error class with status codes
+
+### User Form Modal (`components/admin/user-form.tsx`)
+- Create/edit modal form with validation
+- Fields: full_name, email (required), phone, password (required for create), role, is_active
+- Validation: email format, password length (min 8 chars)
+- Password optional when editing (leave blank to keep current)
+- Close button and cancel/submit actions
+
+### User Management API Routes
+
+#### GET `/api/admin/users?search=x` - List all users (admin-only)
+- Verifies admin session
+- Checks admin role (returns 403 if not admin)
+- Fetches users from database with optional search filter
+- Search filters email, full_name, phone (ilike queries)
+- Returns: { data: User[], total: number }
+
+#### POST `/api/admin/users` - Create new user (admin-only)
+- Verifies admin session
+- Validates required fields: email, password
+- Validates email format (RFC compliant regex)
+- Validates password length (minimum 8 characters)
+- Hashes password using scrypt via hashPassword()
+- Inserts user with optional fields: phone, full_name, role, is_active
+- Handles duplicate email error (code 23505)
+- Returns: { success: true, data: User } or error with Vietnamese message
+
+#### PUT `/api/admin/users/:id` - Update user (admin-only)
+- Verifies admin session and role
+- Allows update of: email, phone, role, full_name, is_active
+- Password optional on edit (leave blank to keep current)
+- Validates email and password same as create
+- Returns updated user object
+- Returns: { success: true, data: User } or error
+
+#### DELETE `/api/admin/users/:id` - Delete user (admin-only)
+- Verifies admin session and role
+- Removes user record from database
+- Returns success or error message
+
+### Security Implementation
+- Admin role verification on all endpoints (403 Forbidden for non-admin)
+- Session verification (401 Unauthorized if not authenticated)
+- Password hashing with scrypt salt+derivedKey format
+- Email format validation (RFC compliant regex)
+- Duplicate email prevention (database constraint 23505)
+- Password length validation (minimum 8 characters)
+- Updated sidebar.tsx with "Quản lý người dùng" link
+
+## Database Integration (Phase 4)
+
+### Supabase Structure (11 Tables)
+```
+Core Tables:
+├── users (id, email, phone, password_hash, role, is_active)
+├── districts (9 Trà Vinh districts)
+├── streets (30+ streets per district)
+└── segments (60+ with 4 price levels each)
+
+Coefficient Tables (5):
+├── land_type_coefficients (7 types, 0.2-1.0)
+├── location_coefficients (9 types, 0.1-1.0)
+├── area_coefficients (8 tiers, 0.4-1.0)
+├── depth_coefficients (3 tiers, 0.25-1.0)
+└── feng_shui_coefficients (4 types, 0.7-0.8)
+
+Feature Tables:
+├── search_history (user searches with timestamps)
+└── brand_settings (app branding configuration)
+```
+
+### TypeScript Integration
+- database.types.ts: 461 lines of auto-generated types
+- client.ts: Supabase client initialization with anon key
+- server.ts: Server-side operations with service role key
+- All 11 tables fully typed with Row, Insert, Update interfaces
+
+### Security
+- Row Level Security (RLS) policies configured
+- User data isolation: users see only own profile
+- Admin operations protected with role checks
+- Public read access to districts, streets, segments
+
+## User Search Flow & Price Calculation (Phase 6)
+
+### Dynamic Dropdowns & Data Fetching
+- Districts dropdown loads all 9 Trà Vinh districts from database
+- Streets filtered by selected district
+- Segments filtered by selected street
+- Real-time dependent data loading
+
+### Price Calculation Engine (`lib/calculations/price-calculator.ts`)
+- Formula: `price = base_price × land_type_coef × location_coef × area_coef × depth_coef × feng_shui_coef`
+- Applies 5 coefficient types:
+  - Land Type (7 types: 1.0 to 0.2)
+  - Location (9 types: 1.0 to 0.1)
+  - Area (8 tiers: 1.0 to 0.4)
+  - Depth (3 tiers: 1.0 to 0.25)
+  - Feng Shui (4 types: 0.7 to 0.8)
+- Calculates all 4 price levels (government, min, max, avg)
+- Returns detailed breakdown for display
+
+### API Routes (`app/api/districts|streets|segments|coefficients/route.ts`)
+- GET /api/districts - Returns all districts
+- GET /api/streets?districtId=x - Returns filtered streets
+- GET /api/segments?streetId=x - Returns segments with all price data
+- GET /api/coefficients - Returns all coefficient types
+
+### Search Data Queries (`lib/api/search-data.ts`)
+- Database queries for cascading dropdown data
+- Efficient joins with related coefficient tables
+- Vietnamese transliteration support
+
+### Calculation Display
+- 4 price cards (government, min, max, avg) in Vietnamese
+- Currency formatting with ₫ symbol and thousand separators
+- Coefficient breakdown showing each factor applied
+- Live recalculation on input changes
+
+## Search History Feature (Phase 7)
+
+### Search History Component (`components/history-card.tsx`)
+- Displays individual search records as gradient-styled cards
+- Extracts land type/location from coefficients_json via helper functions
+- Price formatted as "X tỷ" (billions) or "X triệu" (millions)
+- Date formatted as "HH:MM - Hôm nay/Hôm qua/DD/MM"
+- Action buttons: View (navigate to results), Share (copy text), Delete (with confirm)
+
+### History API Client (`lib/api/history.ts`)
+- `getHistory(page, limit)` - Returns paginated history with stats
+- `saveHistory(input)` - Creates new history record with coefficients
+- `deleteHistory(id)` - Removes record by ID
+- `getHistoryById(id)` - Retrieves single record
+- Price/date formatting functions for Vietnamese locale
+- Error handling with custom HistoryApiError class
+
+### History Page (`app/(user)/history/page.tsx`)
+- Stats cards: total searches, districts, displayed items
+- Paginated card list with "Load more" button
+- States: Loading, Error (with retry), Empty (with CTA)
+- Actions: View (→ results), Share (clipboard), Delete (with confirm)
+- Navigation: segmentId from coefficients_json routes to /results page
 
 ## Design System
 
@@ -375,12 +593,14 @@ landprice/
 ### State Management
 - **Client Components:** `'use client'` directive for interactive features
 - **Login Page:** useState for password visibility toggle
-- **Future:** Phase 5 will implement authentication
+- **User Pages:** useState/useCallback for form state and pagination
+- **Future:** Consider Context API or Redux for global state
 
 ### Form Handling
 - HTML form elements with semantic structure
 - Custom Input component with icon support
 - Button variants for different form actions
+- Server actions for login validation
 
 ## Dependencies Overview
 
@@ -388,6 +608,9 @@ landprice/
 - **next:** Next.js 14 framework
 - **react:** React 18 library
 - **react-dom:** React DOM library
+- **better-auth:** Authentication framework
+- **pg:** PostgreSQL client for Better Auth
+- **@supabase/supabase-js:** Supabase database client
 
 ### Development
 - **TypeScript:** Type checking and development
@@ -527,7 +750,7 @@ Feature Tables:
 
 **API Routes** (`app/api/districts|streets|segments|coefficients/route.ts`)
 - GET /api/districts - Returns all districts
-- GET /api/streets?districtId=x - Returns streets for district
+- GET /api/streets?districtId=x - Returns filtered streets
 - GET /api/segments?streetId=x - Returns segments with all price data
 - GET /api/coefficients - Returns all coefficient types
 
@@ -552,7 +775,7 @@ Feature Tables:
 - Action buttons: View (navigate to results), Share (copy text), Delete (with confirm)
 
 **History API Client** (`lib/api/history.ts`)
-- `getHistory(page, limit)` - Returns paginated search records
+- `getHistory(page, limit)` - Returns paginated history with stats
 - `saveHistory(input)` - Creates new history record with coefficients
 - `deleteHistory(id)` - Removes record by ID
 - `getHistoryById(id)` - Retrieves single record
@@ -612,9 +835,64 @@ Feature Tables:
 - Password length validation (minimum 8 characters)
 - Updated sidebar.tsx with "Quản lý người dùng" link
 
+### Phase 9 Details: Admin Price & Coefficient Management
+
+**Price Management API** (`lib/api/admin-prices.ts`)
+- `getPrices(filters?)` - Fetch all prices with optional filtering by segment/type
+- `updatePrice(id, input)` - Update base price, min, max for specific segment
+- `bulkUpdatePrices(updates)` - Batch update prices for multiple segments
+- `getPriceHistory(segmentId)` - Get price change history with timestamps
+- `formatPriceDisplay(price)` - Format price as Vietnamese currency
+- PricesApiError custom error class with status codes
+
+**Coefficient Management API** (`lib/api/admin-coefficients.ts`)
+- `getCoefficients(type?, filters?)` - Fetch coefficients by type or all types
+- `updateCoefficient(id, input)` - Update coefficient value and metadata
+- `createCoefficient(input)` - Create new coefficient entry
+- `deleteCoefficient(id)` - Delete coefficient (with usage validation)
+- `getCoefficientUsage(id)` - Find segments using specific coefficient
+- CoefficicientsApiError custom error class with status codes
+
+**Admin Prices Page** (`app/(admin)/prices/page.tsx`)
+- Filterable price table by segment, district, street
+- In-line price editing with validation
+- Bulk update functionality for multiple segments
+- Price history timeline view
+- Import/export price changes as CSV
+- Audit trail showing last updated by, timestamp
+
+**Admin Coefficients Page** (`app/(admin)/coefficients/page.tsx`)
+- Tabbed interface for each coefficient type (Land Type, Location, Area, Depth, Feng Shui)
+- Editable coefficient value table with drag-to-reorder
+- Add new coefficient entry form
+- Delete coefficient (with usage check - prevents deletion if in use)
+- Copy coefficient template for bulk creation
+- Coefficient impact preview (shows affected segments)
+
+**Price API Endpoints** (`app/api/admin/prices/*`)
+- GET `/api/admin/prices?segment=x&district=y` - List prices with filtering
+- POST `/api/admin/prices` - Create new price entry
+- PUT `/api/admin/prices/:id` - Update price for segment
+- DELETE `/api/admin/prices/:id` - Remove price entry
+- GET `/api/admin/prices/:id/history` - Price change history
+
+**Coefficient API Endpoints** (`app/api/admin/coefficients/*`)
+- GET `/api/admin/coefficients?type=x` - List coefficients by type
+- POST `/api/admin/coefficients` - Create new coefficient
+- PUT `/api/admin/coefficients/:id` - Update coefficient value
+- DELETE `/api/admin/coefficients/:id` - Delete coefficient
+- GET `/api/admin/coefficients/:id/usage` - Find segments using this coefficient
+
+**Security Implementation**
+- Admin role verification on all price/coefficient endpoints
+- Price range validation (min < max < gov price checks)
+- Coefficient value validation (must be > 0, < 2.0 typically)
+- Audit logging for all price/coefficient changes
+- Vietnamese error messages for validation failures
+- Updated sidebar.tsx with "Quản lý Giá" and "Quản lý Hệ Số" links
+
 ## Future Development Phases
 
-- **Phase 9:** Admin price management
 - **Phase 10:** Excel upload & parsing
 - **Phase 11:** Brand settings management
 - **Phase 12:** Testing & production deployment
@@ -638,3 +916,4 @@ Feature Tables:
 7. Environment variables needed: DATABASE_URL, BETTER_AUTH_SECRET, NEXT_PUBLIC_APP_URL
 8. Design system is comprehensive; reference `design-guidelines.md` for specifics
 9. Component library pattern established for future expansion
+10. Admin user management (Phase 8) complete with full CRUD operations and scrypt password hashing

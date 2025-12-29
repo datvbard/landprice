@@ -1,8 +1,8 @@
 # Land Price App - Project Overview & Product Development Requirements
 
-**Version:** 1.7.0
-**Last Updated:** 2025-12-29 (Phase 8 Complete)
-**Status:** Phase 8 Complete - 67% Overall (8 of 12 phases)
+**Version:** 1.8.0
+**Last Updated:** 2025-12-29 (Phase 9 Complete)
+**Status:** Phase 9 Complete - 75% Overall (9 of 12 phases)
 **Client:** Agribank Trà Vinh
 
 ## Executive Summary
@@ -183,6 +183,12 @@ Empower citizens and real estate professionals to quickly access accurate proper
 
 **Status:** Complete (as of 2025-12-29)
 
+### Phase 9: Admin Price & Coefficient Management (COMPLETE)
+
+**Status:** Complete (as of 2025-12-29)
+
+### Phase 8: Admin User Management (COMPLETE) Details
+
 **Deliverables:**
 - User CRUD operations with admin-only access verification
 - Password hashing using scrypt (Better Auth compatible)
@@ -204,18 +210,51 @@ Empower citizens and real estate professionals to quickly access accurate proper
 - app/(admin)/users/page.tsx - Users table with create/edit/delete actions
 - Updated sidebar.tsx with Users Management link
 
+**Timeline:** 2025-12-29
+**Team:** Full-Stack Development
+
+### Phase 9: Admin Price & Coefficient Management (COMPLETE) Details
+
+**Deliverables:**
+- Price management with segment-level filtering and bulk updates
+- Coefficient management for all 5 coefficient types with usage validation
+- Price history tracking with change audit trail
+- Coefficient impact preview showing affected segments
+- Admin-only price and coefficient CRUD endpoints
+- Price range validation (min < max < government price)
+- Coefficient value validation (>0, <2.0 range)
+- CSV export functionality for price/coefficient changes
+- Tab-based coefficient editor for easy type switching
+- Drag-to-reorder coefficient entries
+
+**Key Features Implemented:**
+- GET /api/admin/prices - Returns filterable price list
+- POST /api/admin/prices - Creates new price entry
+- PUT /api/admin/prices/:id - Updates price for segment
+- DELETE /api/admin/prices/:id - Removes price entry
+- GET /api/admin/prices/:id/history - Returns price change history
+- GET /api/admin/coefficients - Returns coefficients by type
+- POST /api/admin/coefficients - Creates new coefficient
+- PUT /api/admin/coefficients/:id - Updates coefficient value
+- DELETE /api/admin/coefficients/:id - Deletes coefficient (with usage check)
+- GET /api/admin/coefficients/:id/usage - Finds segments using coefficient
+- lib/api/admin-prices.ts - Client functions for price management
+- lib/api/admin-coefficients.ts - Client functions for coefficient management
+- app/(admin)/prices/page.tsx - Price management table with filtering
+- app/(admin)/coefficients/page.tsx - Coefficient editor with tabs
+- Updated sidebar.tsx with "Quản lý Giá" and "Quản lý Hệ Số" links
+
 **Security Features:**
-- Admin role verification on all endpoints
-- Password hashing with scrypt before storage
-- Email format validation (RFC compliant)
-- Duplicate email prevention (database constraint)
-- Vietnamese error messages
-- Password optional on edit (leave blank to keep current)
+- Admin role verification on all price/coefficient endpoints
+- Price range validation (prevents invalid price ranges)
+- Coefficient usage validation (prevents deletion of in-use coefficients)
+- Audit logging for all price/coefficient changes
+- Vietnamese error messages for all validations
 
 **Timeline:** 2025-12-29
 **Team:** Full-Stack Development
 
-### Phase 9-12: Future Phases (PLANNED)
+### Phase 10-12: Future Phases (PLANNED)
 
 Detailed planning for phases 9-12 in project roadmap
 

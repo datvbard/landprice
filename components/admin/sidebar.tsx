@@ -53,14 +53,27 @@ const LogoutIcon = () => (
   </svg>
 )
 
+// Nav item type
+interface NavItem {
+  href: string
+  label: string
+  icon: () => React.ReactElement
+  badge?: string
+}
+
+interface NavSection {
+  title: string
+  items: NavItem[]
+}
+
 // Navigation structure
-const navSections = [
+const navSections: NavSection[] = [
   {
     title: 'Menu chính',
     items: [
       { href: '/dashboard', label: 'Tổng quan', icon: HomeIcon },
-      { href: '#', label: 'Quản lý Giá Đất', icon: PriceIcon, badge: '250' },
-      { href: '#', label: 'Quản lý Hệ Số', icon: CoefficientIcon },
+      { href: '/prices', label: 'Quản lý Giá Đất', icon: PriceIcon },
+      { href: '/coefficients', label: 'Quản lý Hệ Số', icon: CoefficientIcon },
       { href: '/users', label: 'Quản lý Users', icon: UsersIcon },
     ]
   },

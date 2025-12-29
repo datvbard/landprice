@@ -1,8 +1,8 @@
 # Land Price App - Codebase Summary
 
-**Version:** 1.4.0
+**Version:** 1.5.0
 **Last Updated:** 2025-12-29
-**Status:** Phase 5 Complete (Authentication System)
+**Status:** Phase 6 Complete (User Search & Price Calculation)
 
 ## Overview
 
@@ -63,6 +63,11 @@ landprice/
 │   │   ├── client.ts              # Supabase client (anon key)
 │   │   ├── server.ts              # Supabase server (service role)
 │   │   └── database.types.ts      # Generated types (461 lines)
+│   ├── api/
+│   │   ├── search-data.ts         # Database queries for districts/streets/segments
+│   │   └── coefficients.ts        # Coefficient data aggregation
+│   ├── calculations/
+│   │   └── price-calculator.ts    # Price calculation engine with 5 coefficients
 │   └── mock-data/
 │       └── admin-data.ts          # Mock data for admin pages
 ├── middleware.ts            # Route protection middleware
@@ -223,6 +228,30 @@ landprice/
   - POST /api/auth/sign-out
   - GET /api/auth/session
 - **Handler:** Proxies all auth requests to Better Auth
+
+### User Pages (Phase 6: Dynamic & Functional)
+
+#### User Search Page (`app/(user)/page.tsx`)
+- **Features:** Dynamic cascading dropdowns (district → street → segment)
+- **Data Source:** Real database queries for districts, streets, segments
+- **Components:** Select dropdowns with real-time filtering
+- **Area Input:** Text field for property area calculation
+- **Integration:** Calls API routes for data fetching
+- **Lines of Code:** 358 lines (functional with multiple features)
+
+#### User Results Page (`app/(user)/results/page.tsx`)
+- **Purpose:** Display price calculation results with full breakdown
+- **Features:**
+  - 4 price levels (government, min, max, avg)
+  - Calculation breakdown showing each coefficient applied
+  - Vietnamese currency formatting (₫ VND)
+  - Live updates when selections change
+- **Calculation Formula:**
+  ```
+  price = base_price × land_type_coef × location_coef ×
+          area_coef × depth_coef × feng_shui_coef
+  ```
+- **Lines of Code:** 570 lines (comprehensive calculation display)
 
 ### Admin Pages
 
@@ -437,9 +466,44 @@ Feature Tables:
 - Admin operations protected with role checks
 - Public read access to districts, streets, segments
 
+### Phase 6 Details: User Search Flow & Price Calculation
+
+**Dynamic Dropdowns & Data Fetching**
+- Districts dropdown loads all 9 Trà Vinh districts from database
+- Streets filtered by selected district
+- Segments filtered by selected street
+- Real-time dependent data loading
+
+**Price Calculation Engine** (`lib/calculations/price-calculator.ts`)
+- Formula: `price = base_price × land_type_coef × location_coef × area_coef × depth_coef × feng_shui_coef`
+- Applies 5 coefficient types:
+  - Land Type (7 types: 1.0 to 0.2)
+  - Location (9 types: 1.0 to 0.1)
+  - Area (8 tiers: 1.0 to 0.4)
+  - Depth (3 tiers: 1.0 to 0.25)
+  - Feng Shui (4 types: 0.7 to 0.8)
+- Calculates all 4 price levels (government, min, max, avg)
+- Returns detailed breakdown for display
+
+**API Routes** (`app/api/districts|streets|segments|coefficients/route.ts`)
+- GET /api/districts - Returns all districts
+- GET /api/streets?districtId=x - Returns streets for district
+- GET /api/segments?streetId=x - Returns segments with all price data
+- GET /api/coefficients - Returns all coefficient types
+
+**Search Data Queries** (`lib/api/search-data.ts`)
+- Database queries for cascading dropdown data
+- Efficient joins with related coefficient tables
+- Vietnamese transliteration support
+
+**Calculation Display**
+- 4 price cards (government, min, max, avg) in Vietnamese
+- Currency formatting with ₫ symbol and thousand separators
+- Coefficient breakdown showing each factor applied
+- Live recalculation on input changes
+
 ## Future Development Phases
 
-- **Phase 6:** User search & calculation engine
 - **Phase 7:** Search history management
 - **Phase 8:** Admin user management
 - **Phase 9:** Admin price management

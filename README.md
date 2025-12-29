@@ -39,11 +39,37 @@ landprice/
 │   ├── layout.tsx          # Root layout
 │   ├── page.tsx            # Home (redirects to /login)
 │   ├── login/              # Login page
+│   ├── (user)/             # User route group
+│   │   ├── page.tsx        # Search page
+│   │   ├── results/        # Results page
+│   │   └── history/        # History page
+│   ├── (admin)/            # Admin route group
+│   │   ├── layout.tsx      # Sidebar layout
+│   │   ├── dashboard/      # Dashboard page
+│   │   └── settings/       # Settings page
+│   ├── test-supabase/      # DB connection test
 │   └── globals.css         # Global styles
 ├── components/
-│   └── ui/                 # Reusable UI components
-│       ├── button.tsx      # Button (4 variants)
-│       └── input.tsx       # Input with icons
+│   ├── ui/                 # Reusable UI components
+│   │   ├── button.tsx      # Button (4 variants)
+│   │   ├── input.tsx       # Input with icons
+│   │   └── select.tsx      # Select dropdown
+│   ├── admin/              # Admin-specific components
+│   │   ├── sidebar.tsx
+│   │   ├── stat-card.tsx
+│   │   ├── data-table.tsx
+│   │   └── activity-item.tsx
+│   └── bottom-nav.tsx      # User navigation
+├── lib/
+│   ├── supabase/           # Supabase client config
+│   │   ├── client.ts       # Client Supabase
+│   │   ├── server.ts       # Server Supabase
+│   │   └── database.types.ts # TypeScript types (461 lines)
+│   └── mock-data/          # Mock data
+├── supabase/               # Database migrations & seed
+│   ├── migrations/
+│   │   └── 001_initial_schema.sql
+│   └── seed.sql
 ├── docs/                   # Project documentation
 ├── mockup/                 # HTML/CSS mockups
 └── plans/                  # Implementation plans
@@ -72,11 +98,11 @@ landprice/
 | Phase | Description | Status |
 |-------|-------------|--------|
 | 1 | Project Setup & Static Login | ✅ Complete |
-| 2 | Static User Pages (Home, Results, History) | ⏳ Pending |
-| 3 | Static Admin Pages | ⏳ Pending |
-| 4 | Supabase Setup & Database | ⏳ Pending |
-| 5 | Authentication System | ⏳ Pending |
-| 6 | User Search & Calculation | ⏳ Pending |
+| 2 | Static User Pages (Home, Results, History) | ✅ Complete |
+| 3 | Static Admin Pages | ✅ Complete |
+| 4 | Supabase Setup & Database | ✅ Complete |
+| 5 | Authentication System | ✅ Complete |
+| 6 | User Search & Calculation | ✅ Complete |
 | 7 | Search History | ⏳ Pending |
 | 8 | Admin User Management | ⏳ Pending |
 | 9 | Admin Price Management | ⏳ Pending |

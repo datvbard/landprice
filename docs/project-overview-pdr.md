@@ -1,8 +1,8 @@
 # Land Price App - Project Overview & Product Development Requirements
 
-**Version:** 1.0.0
-**Last Updated:** 2025-12-28
-**Status:** Phase 1 Complete
+**Version:** 1.4.0
+**Last Updated:** 2025-12-29
+**Status:** Phase 6 Complete
 **Client:** Agribank Trà Vinh
 
 ## Executive Summary
@@ -44,64 +44,115 @@ Empower citizens and real estate professionals to quickly access accurate proper
 **Timeline:** Q4 2024
 **Team:** UI/Design, Frontend Development
 
-### Phase 2: Search & Property Lookup (PLANNED)
+### Phase 2: Static User Pages (COMPLETE)
+**Status:** Complete (as of 2025-12-28)
 
-**Features:**
-- Home/search screen interface
-- Property search by location, address, land code
-- Real-time search suggestions
-- Property details card display
-- Filter options (district, ward, land type)
+**Deliverables:**
+- Home/search screen interface with dropdowns
+- Results page with 4-level price card display
+- History page with mock search history
+- Bottom navigation component with active state tracking
+- Select dropdown component for location filtering
+- Responsive mobile-first design
 
-**Dependencies:** Phase 1 Complete
+**Timeline:** Q4 2024
+**Team:** Frontend Development
 
-### Phase 3: Calculation & Comparison Tools (PLANNED)
+### Phase 3: Static Admin Pages (COMPLETE)
+**Status:** Complete (as of 2025-12-28)
 
-**Features:**
-- Price calculation based on property characteristics
-- Land area unit conversions
-- Year-over-year value comparison
-- Export functionality (PDF)
-- Valuation reports
+**Deliverables:**
+- Admin dashboard with statistics and activity feed
+- Admin settings page with form layouts
+- Sidebar navigation component with responsive collapse
+- Data table component for CRUD UI
+- Stat card component for metrics display
+- Activity item component for activity logs
+- Mock data for users, prices, coefficients, and activity
 
-**Dependencies:** Phase 2 Complete
+**Timeline:** Q4 2024
+**Team:** Frontend Development
 
-### Phase 4: History & Bookmarks (PLANNED)
+### Phase 4: Supabase Setup & Database (COMPLETE)
+**Status:** Complete (as of 2025-12-29)
 
-**Features:**
-- Search history management
-- Favorite properties bookmarking
-- Offline access to saved data
-- Recent searches display
-- Clear history functionality
+**Deliverables:**
+- Supabase PostgreSQL database configured
+- 11-table relational schema with foreign keys and indexes
+- Row Level Security (RLS) policies implemented
+- Database type definitions (database.types.ts - 461 lines)
+- Supabase client configuration (client.ts, server.ts)
+- Initial data migration (001_initial_schema.sql - 11 tables)
+- Seed data script (seed.sql - 9 districts, 60+ segments, coefficients)
+- Test page for Supabase connectivity verification
 
-**Dependencies:** Phase 2 Complete
+**Database Tables:**
+- users, districts, streets, segments
+- land_type_coefficients, location_coefficients, area_coefficients
+- depth_coefficients, feng_shui_coefficients, search_history, brand_settings
 
-### Phase 5: Authentication & Personalization (PLANNED)
+**Timeline:** Q4 2024 - Q1 2025
+**Team:** Backend & Database Development
 
-**Features:**
-- User registration and login
-- Email/phone verification
-- Password reset flow
-- User profile management
-- Personal valuation history
-- Saved searches synchronization
-- Preference settings
 
-**Dependencies:** All Previous Phases
+### Phase 5: Authentication System (COMPLETE)
 
-### Phase 6: Admin Dashboard (PLANNED)
+**Status:** Complete (as of 2025-12-29)
 
-**Features:**
-- Admin authentication
-- Property data management
-- Pricing update interface
-- User analytics
-- System monitoring
-- Report generation
-- Settings configuration
+**Deliverables:**
+- Better Auth integration with PostgreSQL (Supabase)
+- Email/phone + password authentication
+- User role management (admin/user)
+- Session management with secure cookies (7-day expiry)
+- Route protection middleware
+- Login validation and error handling
+- Server action for secure form submission
+- Header component with logout functionality
+- useAuth hook for client-side auth state
+- Password complexity validation (8+ chars, uppercase, lowercase, number)
+- Vietnamese phone number support
+- User enumeration prevention
 
-**Dependencies:** Phase 5 Complete
+**Key Features Implemented:**
+- Email/password login with role-based routing
+- Middleware-protected routes
+- Session caching (5-minute TTL)
+- Secure httpOnly cookies
+- Login error messages (Vietnamese)
+- Header with user info and logout
+
+**Timeline:** Q4 2024 - Q1 2025
+**Team:** Backend & Authentication Development
+
+### Phase 6: User Search & Calculation (COMPLETE)
+
+**Status:** Complete (as of 2025-12-29)
+
+**Deliverables:**
+- Dynamic cascading dropdowns (district → street → segment)
+- Real database queries for all three dropdown levels
+- Price calculation engine with 5 coefficient types
+- 4 price level display (government, min, max, avg)
+- Calculation breakdown showing each coefficient applied
+- Vietnamese currency formatting (₫ VND)
+- API routes for districts, streets, segments, and coefficients
+- Live calculation updates on input changes
+- Area input field for property size calculation
+
+**Key Features Implemented:**
+- GET /api/districts - Returns all 9 Trà Vinh districts
+- GET /api/streets?districtId=x - Returns filtered streets
+- GET /api/segments?streetId=x - Returns segments with price data
+- GET /api/coefficients - Returns all 5 coefficient types
+- Price calculator with formula: base_price × land_type × location × area × depth × feng_shui
+- Results page displays all 4 price levels calculated
+
+**Timeline:** 2025-12-29
+**Team:** Full-Stack Development
+
+### Phase 7-12: Future Phases (PLANNED)
+
+Detailed planning for phases 7-12 in project roadmap
 
 ## Functional Requirements
 
@@ -152,7 +203,45 @@ Empower citizens and real estate professionals to quickly access accurate proper
 - Create animation keyframes
 - Configure Tailwind design tokens
 
-### Phase 2+ (Future Requirements Listed in Phase Documents)
+### Phase 5 - Authentication System
+
+**FR5.1: User Authentication**
+- Support email and Vietnamese phone number login
+- Validate email format and phone format
+- Implement password complexity rules (8+ chars, upper, lower, number)
+- Store passwords securely (scrypt hashing)
+- Create user sessions with 7-day expiry
+
+**FR5.2: Session Management**
+- Create secure httpOnly cookies
+- Cache sessions for 5 minutes (performance)
+- Validate sessions on protected routes
+- Support user logout
+
+**FR5.3: Route Protection**
+- Redirect unauthenticated users to /login
+- Protect user routes (/, /results, /history)
+- Protect admin routes (/admin/*)
+- Allow public access to /login and /api/auth/*
+
+**FR5.4: Role-Based Routing**
+- Support admin and user roles
+- Redirect admins to /admin/dashboard on login
+- Redirect users to / on login
+- Display admin badge in header for admin users
+
+**FR5.5: User Management**
+- Support user profile fields (name, email, phone, role)
+- Enable user activation/deactivation
+- Track user creation date
+
+**FR5.6: Error Handling**
+- Display generic error messages (prevent user enumeration)
+- Validate user exists and is active
+- Provide Vietnamese error messages
+- Log authentication failures
+
+### Phase 6+ (Future Requirements Listed in Phase Documents)
 
 ## Non-Functional Requirements
 
@@ -181,15 +270,24 @@ Empower citizens and real estate professionals to quickly access accurate proper
 - No sensitive data handling
 - HTTPS enforcement (deployment)
 
-**Phase 5+:**
-- Password encryption (bcrypt, minimum 10 rounds)
-- Session token validation (JWT or secure cookies)
+**Phase 5 (COMPLETE):**
+- Password encryption (scrypt hashing via Better Auth)
+- Secure httpOnly cookies with sameSite=Strict
+- User enumeration prevention (generic error messages)
+- Active status validation
+- Input validation (email, phone, password)
+- Vietnamese phone format support
+- Session expiry (7 days)
+- CSRF protection (Next.js form action)
+- Next.js built-in security headers
+
+**Phase 5+ (FUTURE):**
 - Rate limiting (login attempts)
-- CSRF protection
-- SQL injection prevention
-- Input validation and sanitization
-- Secure password reset flow
+- Password reset flow
+- Email verification
 - Two-factor authentication (optional)
+- Audit logging
+- Session invalidation on logout
 
 ### Accessibility Requirements
 

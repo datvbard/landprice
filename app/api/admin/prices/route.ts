@@ -50,8 +50,24 @@ export async function GET(request: NextRequest) {
     if (streetId) {
       query = query.eq('street_id', streetId)
     } else if (districtId) {
-      // Filter by district through streets (use actual table name, not alias)
-      query = query.eq('streets.district_id', districtId)
+      // Get street IDs for this district first, then filter segments
+      const { data: districtStreets } = await supabaseAdmin
+        .from('streets')
+        .select('id')
+        .eq('district_id', districtId)
+
+      if (districtStreets && districtStreets.length > 0) {
+        const streetIds = districtStreets.map(s => s.id)
+        query = query.in('street_id', streetIds)
+      } else {
+        // No streets in this district, return empty
+        return NextResponse.json({
+          data: [],
+          total: 0,
+          page,
+          pageSize,
+        })
+      }
     }
 
     // Search filter (search in street name or segment description)

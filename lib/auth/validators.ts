@@ -8,12 +8,19 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 // Vietnamese phone: 10-11 digits, may start with 0, +84, or 84
 const PHONE_REGEX = /^(\+84|84|0)[0-9]{9,10}$/
 
+// Username: 3-50 chars, alphanumeric + underscore, must start with letter
+const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_]{2,49}$/
+
 export function isValidEmail(email: string): boolean {
   return EMAIL_REGEX.test(email.trim())
 }
 
 export function isValidPhone(phone: string): boolean {
   return PHONE_REGEX.test(phone.trim().replace(/\s/g, ''))
+}
+
+export function isValidUsername(username: string): boolean {
+  return USERNAME_REGEX.test(username.trim())
 }
 
 /**
@@ -31,10 +38,10 @@ export function isValidPassword(password: string): boolean {
 }
 
 /**
- * Normalize input to determine if it's email or phone
+ * Normalize input to determine if it's email, phone, or username
  */
-export function normalizeEmailOrPhone(input: string): {
-  type: 'email' | 'phone' | 'invalid'
+export function normalizeIdentifier(input: string): {
+  type: 'email' | 'phone' | 'username' | 'invalid'
   value: string
 } {
   const trimmed = input.trim()
@@ -55,5 +62,24 @@ export function normalizeEmailOrPhone(input: string): {
     return { type: 'phone', value: normalized }
   }
 
+  // Check username last (after email/phone)
+  if (isValidUsername(trimmed)) {
+    return { type: 'username', value: trimmed.toLowerCase() }
+  }
+
   return { type: 'invalid', value: trimmed }
+}
+
+/**
+ * @deprecated Use normalizeIdentifier instead
+ */
+export function normalizeEmailOrPhone(input: string): {
+  type: 'email' | 'phone' | 'invalid'
+  value: string
+} {
+  const result = normalizeIdentifier(input)
+  if (result.type === 'username') {
+    return { type: 'invalid', value: result.value }
+  }
+  return result as { type: 'email' | 'phone' | 'invalid'; value: string }
 }

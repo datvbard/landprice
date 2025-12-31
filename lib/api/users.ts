@@ -14,6 +14,7 @@ export interface UsersListResponse {
 export interface CreateUserInput {
   email: string
   phone?: string
+  username?: string
   password: string
   role: 'admin' | 'user'
   full_name?: string
@@ -23,6 +24,7 @@ export interface CreateUserInput {
 export interface UpdateUserInput {
   email?: string
   phone?: string
+  username?: string
   password?: string
   role?: 'admin' | 'user'
   full_name?: string

@@ -1,7 +1,7 @@
 'use server'
 
 import { supabaseAdmin } from '@/lib/supabase/server'
-import { normalizeEmailOrPhone, isValidPassword } from '@/lib/auth/validators'
+import { normalizeIdentifier, isValidPassword } from '@/lib/auth/validators'
 
 export type ValidationResult = {
   success: boolean
@@ -12,7 +12,7 @@ export type ValidationResult = {
 
 /**
  * Validates login input and returns user email for client-side auth
- * - Validates email/phone format
+ * - Validates username/email/phone format
  * - Checks user exists and is active
  * - Returns email and redirect path
  */
@@ -30,27 +30,36 @@ export async function validateLoginInput(
       return { success: false, error: 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số' }
     }
 
-    // Normalize identifier (email or phone)
-    const normalized = normalizeEmailOrPhone(identifier)
+    // Normalize identifier (username, email, or phone)
+    const normalized = normalizeIdentifier(identifier)
     if (normalized.type === 'invalid') {
-      return { success: false, error: 'Email hoặc số điện thoại không đúng định dạng' }
+      return { success: false, error: 'Tên đăng nhập không đúng định dạng' }
     }
 
-    // Query user from Better Auth 'user' table
-    const query = normalized.type === 'email'
-      ? supabaseAdmin.from('user').select('*').eq('email', normalized.value).single()
-      : supabaseAdmin.from('user').select('*').eq('phone', normalized.value).single()
+    // Query user from Better Auth 'user' table based on identifier type
+    let query
+    switch (normalized.type) {
+      case 'email':
+        query = supabaseAdmin.from('user').select('*').eq('email', normalized.value).single()
+        break
+      case 'phone':
+        query = supabaseAdmin.from('user').select('*').eq('phone', normalized.value).single()
+        break
+      case 'username':
+        query = supabaseAdmin.from('user').select('*').eq('username', normalized.value).single()
+        break
+    }
 
     const { data: user, error: userError } = await query
 
     // Generic error to prevent user enumeration
     if (userError || !user) {
-      return { success: false, error: 'Email/số điện thoại hoặc mật khẩu không chính xác' }
+      return { success: false, error: 'Tên đăng nhập hoặc mật khẩu không chính xác' }
     }
 
     // Check if user is active (use generic error)
     if (!user.is_active) {
-      return { success: false, error: 'Email/số điện thoại hoặc mật khẩu không chính xác' }
+      return { success: false, error: 'Tên đăng nhập hoặc mật khẩu không chính xác' }
     }
 
     // Determine redirect based on role

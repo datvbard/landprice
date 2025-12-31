@@ -33,12 +33,12 @@ export async function GET(request: Request) {
     // Build query - use 'user' table (Better Auth uses camelCase)
     let query = supabaseAdmin
       .from('user')
-      .select('id, email, name, phone, role, full_name, is_active, createdAt, updatedAt', { count: 'exact' })
+      .select('id, email, name, phone, username, role, full_name, is_active, createdAt, updatedAt', { count: 'exact' })
       .order('createdAt', { ascending: false })
 
     // Apply search filter
     if (search) {
-      query = query.or(`email.ilike.%${search}%,full_name.ilike.%${search}%,phone.ilike.%${search}%`)
+      query = query.or(`email.ilike.%${search}%,full_name.ilike.%${search}%,phone.ilike.%${search}%,username.ilike.%${search}%`)
     }
 
     const { data, error, count } = await query
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { email, phone, password, role, full_name, is_active } = body
+    const { email, phone, username, password, role, full_name, is_active } = body
 
     // Validate required fields
     if (!email || !password) {
@@ -102,30 +102,68 @@ export async function POST(request: Request) {
       )
     }
 
-    // Use Better Auth's sign-up API to create user (ensures proper password hashing)
-    const signUpResult = await auth.api.signUpEmail({
-      body: {
-        email,
-        password,
-        name: full_name || email.split('@')[0],
-      },
-    })
+    // Hash password using scrypt (Better Auth compatible)
+    const crypto = await import('crypto')
+    const { promisify } = await import('util')
+    const scryptAsync = promisify(crypto.scrypt)
+    const salt = crypto.randomBytes(16).toString('hex')
+    const derivedKey = (await scryptAsync(password, salt, 64)) as Buffer
+    const hashedPassword = `${salt}:${derivedKey.toString('hex')}`
 
-    if (!signUpResult?.user?.id) {
-      return NextResponse.json({ error: 'Không thể tạo tài khoản' }, { status: 500 })
-    }
+    // Generate unique IDs
+    const userId = crypto.randomBytes(16).toString('base64url')
+    const accountId = crypto.randomBytes(16).toString('base64url')
 
-    // Update additional fields in user table
-    const { data, error } = await supabaseAdmin
+    // Create user directly in database (avoid session change from signUpEmail)
+    const { error: userError } = await supabaseAdmin
       .from('user')
-      .update({
+      .insert({
+        id: userId,
+        email,
+        name: full_name || email.split('@')[0],
         phone: phone || null,
+        username: username || null,
         role: role || 'user',
         full_name: full_name || null,
         is_active: is_active ?? true,
+        emailVerified: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       })
-      .eq('id', signUpResult.user.id)
-      .select('id, email, name, phone, role, full_name, is_active, createdAt, updatedAt')
+
+    if (userError) {
+      if (userError.code === '23505') {
+        return NextResponse.json({ error: 'Email hoặc username đã tồn tại' }, { status: 409 })
+      }
+      console.error('Error creating user:', userError)
+      return NextResponse.json({ error: 'Không thể tạo tài khoản' }, { status: 500 })
+    }
+
+    // Create account with password
+    const { error: accountError } = await supabaseAdmin
+      .from('account')
+      .insert({
+        id: accountId,
+        accountId: email,
+        providerId: 'credential',
+        userId: userId,
+        password: hashedPassword,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+
+    if (accountError) {
+      // Rollback user creation
+      await supabaseAdmin.from('user').delete().eq('id', userId)
+      console.error('Error creating account:', accountError)
+      return NextResponse.json({ error: 'Không thể tạo tài khoản' }, { status: 500 })
+    }
+
+    // Fetch created user
+    const { data, error } = await supabaseAdmin
+      .from('user')
+      .select('id, email, name, phone, username, role, full_name, is_active, createdAt, updatedAt')
+      .eq('id', userId)
       .single()
 
     if (error) {

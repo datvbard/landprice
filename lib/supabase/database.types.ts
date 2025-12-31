@@ -21,6 +21,7 @@ export interface Database {
           id: string
           email: string
           phone: string | null
+          username: string | null
           password_hash: string
           role: 'admin' | 'user'
           full_name: string | null
@@ -32,6 +33,7 @@ export interface Database {
           id?: string
           email: string
           phone?: string | null
+          username?: string | null
           password_hash: string
           role?: 'admin' | 'user'
           full_name?: string | null
@@ -43,6 +45,7 @@ export interface Database {
           id?: string
           email?: string
           phone?: string | null
+          username?: string | null
           password_hash?: string
           role?: 'admin' | 'user'
           full_name?: string | null

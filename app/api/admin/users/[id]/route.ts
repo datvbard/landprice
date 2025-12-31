@@ -32,7 +32,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
     }
 
     const body = await request.json()
-    const { email, phone, password, role, full_name, is_active } = body
+    const { email, phone, username, password, role, full_name, is_active } = body
 
     // Build update object (Better Auth uses camelCase)
     const updateData: Record<string, unknown> = {
@@ -49,6 +49,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
     }
 
     if (phone !== undefined) updateData.phone = phone || null
+    if (username !== undefined) updateData.username = username || null
     if (role !== undefined) updateData.role = role
     if (full_name !== undefined) updateData.full_name = full_name || null
     if (is_active !== undefined) updateData.is_active = is_active
@@ -81,7 +82,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
       .from('user')
       .update(updateData)
       .eq('id', id)
-      .select('id, email, name, phone, role, full_name, is_active, createdAt, updatedAt')
+      .select('id, email, name, phone, username, role, full_name, is_active, createdAt, updatedAt')
       .single()
 
     if (error) {

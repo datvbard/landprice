@@ -39,7 +39,7 @@ export default function LoginPage() {
       })
 
       if (!res.ok) {
-        setError('Email/số điện thoại hoặc mật khẩu không chính xác')
+        setError('Tên đăng nhập hoặc mật khẩu không chính xác')
         setIsLoading(false)
         return
       }
@@ -113,18 +113,18 @@ export default function LoginPage() {
 
           {/* Login Form */}
           <form className="mb-6" onSubmit={handleLogin}>
-            {/* Phone/Email Input */}
+            {/* Username/Email/Phone Input */}
             <div className="mb-4">
               <Input
                 type="text"
-                placeholder="Số điện thoại hoặc Email"
+                placeholder="Tên đăng nhập"
                 autoComplete="username"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 disabled={isLoading}
                 icon={
                   <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                   </svg>
                 }
               />

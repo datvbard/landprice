@@ -13,6 +13,7 @@ const CloseIcon = () => (
 export interface UserFormData {
   email: string
   phone: string
+  username: string
   password: string
   role: 'admin' | 'user'
   full_name: string
@@ -31,6 +32,7 @@ export function UserForm({ isOpen, onClose, onSubmit, editUser, isSubmitting = f
   const [formData, setFormData] = useState<UserFormData>({
     email: '',
     phone: '',
+    username: '',
     password: '',
     role: 'user',
     full_name: '',
@@ -44,6 +46,7 @@ export function UserForm({ isOpen, onClose, onSubmit, editUser, isSubmitting = f
       setFormData({
         email: editUser.email || '',
         phone: editUser.phone || '',
+        username: (editUser as { username?: string }).username || '',
         password: '', // Don't show password when editing
         role: editUser.role,
         full_name: editUser.full_name || '',
@@ -53,6 +56,7 @@ export function UserForm({ isOpen, onClose, onSubmit, editUser, isSubmitting = f
       setFormData({
         email: '',
         phone: '',
+        username: '',
         password: '',
         role: 'user',
         full_name: '',
@@ -124,6 +128,24 @@ export function UserForm({ isOpen, onClose, onSubmit, editUser, isSubmitting = f
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
               placeholder="Nguyễn Văn A"
             />
+          </div>
+
+          {/* Username */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Tên đăng nhập
+            </label>
+            <input
+              type="text"
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${
+                errors.username ? 'border-red-500' : 'border-gray-300'
+              }`}
+              placeholder="nguyenvana"
+            />
+            {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
+            <p className="text-xs text-gray-400 mt-1">Chữ thường, số và dấu gạch dưới. VD: nguyen_van_a</p>
           </div>
 
           {/* Email */}

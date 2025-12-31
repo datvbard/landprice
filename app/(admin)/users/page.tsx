@@ -86,6 +86,7 @@ export default function UsersPage() {
         const updateData: Record<string, unknown> = {
           email: data.email,
           phone: data.phone || null,
+          username: data.username || null,
           role: data.role,
           full_name: data.full_name || null,
           is_active: data.is_active,
@@ -160,7 +161,7 @@ export default function UsersPage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Tìm kiếm theo email, tên, số điện thoại..."
+            placeholder="Tìm kiếm theo tên đăng nhập, email, tên, số điện thoại..."
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           />
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -217,6 +218,9 @@ export default function UsersPage() {
                         </div>
                         <div>
                           <div className="font-medium text-gray-800">{user.full_name || '-'}</div>
+                          {(user as { username?: string }).username && (
+                            <div className="text-xs text-primary font-medium">@{(user as { username?: string }).username}</div>
+                          )}
                           <div className="text-sm text-gray-500">{user.email}</div>
                         </div>
                       </div>
